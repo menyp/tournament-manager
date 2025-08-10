@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}Tournament Manager - Home{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <div class="md:flex md:items-center md:justify-between mb-6">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                Tournament Manager
+            </h1>
+            <p class="mt-1 text-sm text-gray-500">
+                Create and manage your sports tournaments with ease
+            </p>
+        </div>
+        <div class="mt-4 flex md:mt-0 md:ml-4
+            ">
+            <a href="/tournament/new" 
+               class="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-plus mr-2"></i> New Tournament
+            </a>
+        </div>
+    </div>
+
+    <!-- Tournaments List -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                Your Tournaments
+            </h3>
+        </div>
+        
+        {% if tournaments %}
+            <ul class="divide-y divide-gray-200">
+                {% for tournament in tournaments %}
+                <li class="hover:bg-gray-50">
+                    <a href="{{ url_for('view_tournament', tournament_id=tournament.id) }}" class="block">
+                        <div class="px-4 py-4 sm:px-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="text-sm font-medium text-blue-600 truncate">
+                                        {{ tournament.name }}
+                                    </div>
+                                    <div class="ml-2 flex-shrink-0 flex">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            {% if tournament.status == 'group' %}bg-green-100 text-green-800
+                                            {% elif tournament.status == 'knockout' %}bg-yellow-100 text-yellow-800
+                                            else %}bg-gray-100 text-gray-800{% endif %}">
+                                            {{ tournament.status|replace('_', ' ')|title }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="ml-2 flex-shrink-0 flex">
+                                    <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        {{ tournament.groups|length }} Groups
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-2 sm:flex sm:justify-between">
+                                <div class="sm:flex">
+                                    <p class="flex items-center text-sm text-gray-500">
+                                        <i class="far fa-calendar-alt mr-1.5"></i>
+                                        {{ tournament.start_date.strftime('%b %d, %Y') }} - {{ tournament.end_date.strftime('%b %d, %Y') }}
+                                    </p>
+                                    <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
+                                        <i class="far fa-clock mr-1.5"></i>
+                                        {{ tournament.groups|length }} Groups
+                                    </p>
+                                </div>
+                                <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                                    <i class="far fa-calendar-plus mr-1.5"></i>
+                                    Tournament
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="px-4 py-12 text-center">
+                <i class="fas fa-trophy text-4xl text-gray-300 mb-3"></i>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No tournaments</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    Get started by creating a new tournament.
+                </p>
+                <div class="mt-6">
+                    <a href="{{ url_for('new_tournament') }}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-plus mr-2 -ml-1"></i>
+                        New Tournament
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="mt-8">
+        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+            Quick Stats
+        </h3>
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                            <i class="fas fa-trophy text-white"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    Total Tournaments
+                                </dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900">
+                                        {{ tournaments|length }}
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    Total Teams
+                                </dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900">
+                                        {% set team_count = 0 %}
+                                        {% for tournament in tournaments %}
+                                            {% for group in tournament.groups %}
+                                                {% set team_count = team_count + group.teams|length %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                        {{ team_count }}
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+                            <i class="fas fa-futbol text-white"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    Total Matches
+                                </dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900">
+                                        {% set match_count = 0 %}
+                                        {% for tournament in tournaments %}
+                                            {% set match_count = match_count + tournament.matches|length %}
+                                        {% endfor %}
+                                        {{ match_count }}
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                            <i class="fas fa-calendar-check text-white"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    Active Tournaments
+                                </dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900">
+                                        {% set active_count = 0 %}
+                                        {% for tournament in tournaments %}
+                                            {% if tournament.status == 'group' %}
+                                                {% set active_count = active_count + 1 %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ active_count }}
+                                    </div>
+                                    <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                                        in progress
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not tournaments %}
+<!-- Welcome Modal -->
+<div class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div>
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+                    <i class="fas fa-trophy text-blue-600"></i>
+                </div>
+                <div class="mt-3 text-center sm:mt-5">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                        Welcome to Tournament Manager
+                    </h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-500">
+                            Create and manage your sports tournaments with our easy-to-use platform. Get started by creating your first tournament!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 sm:mt-6">
+                <a href="{{ url_for('new_tournament') }}" class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm">
+                    Create Your First Tournament
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Close welcome modal when clicking outside
+window.addEventListener('click', function(event) {
+    const modal = document.querySelector('.fixed.inset-0');
+    if (event.target === modal) {
+        modal.remove();
+    }
+});
+
+// Close modal after 5 seconds if user doesn't interact
+setTimeout(() => {
+    const modal = document.querySelector('.fixed.inset-0');
+    if (modal) modal.remove();
+}, 5000);
+</script>
+{% endblock %}

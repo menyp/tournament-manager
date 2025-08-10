@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tournament.name }} - Tournament Manager{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <div class="flex justify-between items-center mb-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ tournament.name }}</h1>
+            <p class="text-sm text-gray-500">
+                {{ tournament.start_date.strftime('%B %d, %Y') }} - {{ tournament.end_date.strftime('%B %d, %Y') }}
+            </p>
+        </div>
+        <div class="flex space-x-3">
+            <a href="{{ url_for('home') }}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-home mr-2"></i> Home
+            </a>
+            <a href="#" id="shuffle-groups-btn" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <i class="fas fa-random mr-2"></i> Shuffle Groups
+            </a>
+            <a href="#" onclick="window.print()" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-print mr-2"></i> Print
+            </a>
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-900">Tournament Groups</h2>
+    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for group in tournament.groups %}
+            <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">{{ group.name }}</h3>
+                </div>
+                <ul class="divide-y divide-gray-200">
+                    {% for team in group.teams %}
+                    <li class="px-4 py-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-900">{{ team.name }}</span>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="px-4 py-3 text-sm text-gray-500 italic">No teams in this group</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+<script>
+    document.getElementById('shuffle-groups-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        var totalGroups = {{ tournament.groups|length }};
+        var totalTeams = {{ tournament.groups|map(attribute='teams')|map('length')|sum }};
+        var message = 'Are you sure you want to shuffle all ' + totalTeams + ' teams across ' + totalGroups + ' groups?\n\nThis will randomly reassign all teams while maintaining the same number of teams per group.\n\nThis action cannot be undone.';
+        
+        if (confirm(message)) {
+            // Show loading indicator
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Shuffling...';
+            this.disabled = true;
+            window.location.href = "{{ url_for('shuffle_groups', tournament_id=tournament.id) }}";
+        }
+    });
+</script>
+{% endblock %}
