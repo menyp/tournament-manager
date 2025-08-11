@@ -8,8 +8,10 @@ from collections import defaultdict
 
 # Initialize Flask app
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.urandom(24)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tournament.db'
+
+# Configure from environment variables for production or use defaults for development
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24))
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///tournament.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SHUFFLE_SEED'] = None  # For reproducible shuffling if needed
 
